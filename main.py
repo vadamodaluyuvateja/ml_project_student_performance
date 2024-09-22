@@ -1,7 +1,6 @@
 import streamlit as st
 import numpy as np
 import pandas as pd
-
 from sklearn.preprocessing import StandardScaler
 from src.pipeline.predict_pipeline import CustomData, PredictPipeline
 
@@ -22,18 +21,28 @@ writing_score = st.number_input("Writing Score out of 100", min_value=0, max_val
 
 # Button for prediction
 if st.button("Predict your Maths Score"):
-    data = CustomData(
-        gender=gender,
-        race_ethnicity=ethnicity,
-        parental_level_of_education=parental_level_of_education,
-        lunch=lunch,
-        test_preparation_course=test_preparation_course,
-        reading_score=reading_score,
-        writing_score=writing_score
-    )
+    # Validate inputs
+    if gender == "Select your Gender" or ethnicity == "Select Ethnicity" or \
+       parental_level_of_education == "Select Parent Education" or lunch == "Select Lunch Type" or \
+       test_preparation_course == "Select Test Course":
+        st.error("Please select all fields correctly.")
+    else:
+        try:
+            data = CustomData(
+                gender=gender,
+                race_ethnicity=ethnicity,
+                parental_level_of_education=parental_level_of_education,
+                lunch=lunch,
+                test_preparation_course=test_preparation_course,
+                reading_score=reading_score,
+                writing_score=writing_score
+            )
 
-    pred_df = data.get_data_as_data_frame()
-    predict_pipeline = PredictPipeline()
-    results = predict_pipeline.predict(pred_df)
+            pred_df = data.get_data_as_data_frame()
+            predict_pipeline = PredictPipeline()
+            results = predict_pipeline.predict(pred_df)
 
-    st.success(f'The predicted score is: {results[0]}')
+            st.success(f'The predicted score is: {results[0]}')
+
+        except Exception as e:
+            st.error(f"An error occurred during prediction: {e}")
